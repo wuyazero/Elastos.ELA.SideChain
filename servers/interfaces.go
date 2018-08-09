@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	chain "github.com/elastos/Elastos.ELA.SideChain/blockchain"
+	"github.com/elastos/Elastos.ELA.SideChain/core"
 	"github.com/elastos/Elastos.ELA.SideChain/config"
-	. "github.com/elastos/Elastos.ELA.SideChain/core"
+	. "github.com/elastos/Elastos.ELA.SideChain/core/types"
 	. "github.com/elastos/Elastos.ELA.SideChain/errors"
 	"github.com/elastos/Elastos.ELA.SideChain/log"
 	"github.com/elastos/Elastos.ELA.SideChain/pow"
@@ -83,7 +83,7 @@ func GetTransactionInfo(header *Header, tx *Transaction) *TransactionInfo {
 	var time uint32
 	var blockTime uint32
 	if header != nil {
-		confirmations = chain.DefaultLedger.Blockchain.GetBestHeight() - header.Height + 1
+		confirmations = core.DefaultChain.GetBestHeight() - header.Height + 1
 		blockHash = ToReversedString(header.Hash())
 		time = header.Timestamp
 		blockTime = header.Timestamp
@@ -227,15 +227,15 @@ func GetRawTransaction(param Params) map[string]interface{} {
 	if err != nil {
 		return ResponsePack(InvalidTransaction, "")
 	}
-	tx, height, err := chain.DefaultLedger.Store.GetTransaction(hash)
+	tx, height, err := core.DefaultChain.Store.GetTransaction(hash)
 	if err != nil {
 		return ResponsePack(UnknownTransaction, "")
 	}
-	bHash, err := chain.DefaultLedger.Store.GetBlockHash(height)
+	bHash, err := core.DefaultChain.Store.GetBlockHash(height)
 	if err != nil {
 		return ResponsePack(UnknownTransaction, "")
 	}
-	header, err := chain.DefaultLedger.Store.GetHeader(bHash)
+	header, err := core.DefaultChain.Store.GetHeader(bHash)
 	if err != nil {
 		return ResponsePack(UnknownTransaction, "")
 	}
@@ -304,7 +304,7 @@ func SubmitSideAuxBlock(param Params) map[string]interface{} {
 		return ResponsePack(InternalError, "[json-rpc:SubmitSideAuxBlock] deserialize side aux pow failed")
 	}
 
-	inMainChain, isOrphan, err := chain.DefaultLedger.Blockchain.AddBlock(LocalPow.MsgBlock.BlockData[blockHash])
+	inMainChain, isOrphan, err := core.DefaultChain.AddBlock(LocalPow.MsgBlock.BlockData[blockHash])
 	if err != nil {
 		log.Trace(err)
 		return ResponsePack(InternalError, "")
@@ -383,18 +383,18 @@ func CreateAuxBlock(param Params) map[string]interface{} {
 
 	LocalPow.PayToAddr = addr
 
-	genesisHash, err := chain.DefaultLedger.Store.GetBlockHash(uint32(0))
+	genesisHash, err := core.DefaultChain.Store.GetBlockHash(uint32(0))
 	if err != nil {
 		return ResponsePack(Error, "Get genesis hash failed")
 	}
 	genesisHashStr := BytesToHexString(genesisHash.Bytes())
 
-	preHash := chain.DefaultLedger.Blockchain.CurrentBlockHash()
+	preHash := core.DefaultChain.CurrentBlockHash()
 	preHashStr := BytesToHexString(preHash.Bytes())
 
 	SendToAux := SideAuxBlock{
 		GenesisHash:       genesisHashStr,
-		Height:            chain.DefaultLedger.Store.GetHeight(),
+		Height:            core.DefaultChain.Store.GetHeight(),
 		Bits:              fmt.Sprintf("%x", msgBlock.Bits), //difficulty
 		Hash:              curHashStr,
 		PreviousBlockHash: preHashStr,
@@ -506,16 +506,16 @@ func GetBlockInfo(block *Block, verbose bool) BlockInfo {
 	binary.BigEndian.PutUint32(versionBytes[:], block.Header.Version)
 
 	var chainWork [4]byte
-	binary.BigEndian.PutUint32(chainWork[:], chain.DefaultLedger.Blockchain.GetBestHeight()-block.Header.Height)
+	binary.BigEndian.PutUint32(chainWork[:], core.DefaultChain.GetBestHeight()-block.Header.Height)
 
-	nextBlockHash, _ := chain.DefaultLedger.Store.GetBlockHash(block.Header.Height + 1)
+	nextBlockHash, _ := core.DefaultChain.Store.GetBlockHash(block.Header.Height + 1)
 
 	auxPow := new(bytes.Buffer)
 	block.Header.SideAuxPow.Serialize(auxPow)
 
 	return BlockInfo{
 		Hash:              ToReversedString(block.Hash()),
-		Confirmations:     chain.DefaultLedger.Blockchain.GetBestHeight() - block.Header.Height + 1,
+		Confirmations:     core.DefaultChain.GetBestHeight() - block.Header.Height + 1,
 		StrippedSize:      uint32(block.GetSize()),
 		Size:              uint32(block.GetSize()),
 		Weight:            uint32(block.GetSize() * 4),
@@ -528,7 +528,7 @@ func GetBlockInfo(block *Block, verbose bool) BlockInfo {
 		MedianTime:        block.Header.Timestamp,
 		Nonce:             block.Header.Nonce,
 		Bits:              block.Header.Bits,
-		Difficulty:        chain.CalcCurrentDifficulty(block.Header.Bits),
+		Difficulty:        core.CalcCurrentDifficulty(block.Header.Bits),
 		ChainWork:         BytesToHexString(chainWork[:]),
 		PreviousBlockHash: ToReversedString(block.Header.Previous),
 		NextBlockHash:     ToReversedString(nextBlockHash),
@@ -537,7 +537,7 @@ func GetBlockInfo(block *Block, verbose bool) BlockInfo {
 }
 
 func getBlock(hash Uint256, format uint32) (interface{}, ErrCode) {
-	block, err := chain.DefaultLedger.Store.GetBlock(hash)
+	block, err := core.DefaultChain.Store.GetBlock(hash)
 	if err != nil {
 		return "", UnknownBlock
 	}
@@ -630,7 +630,7 @@ func SendRawTransaction(param Params) map[string]interface{} {
 }
 
 func GetBlockHeight(param Params) map[string]interface{} {
-	return ResponsePack(Success, chain.DefaultLedger.Blockchain.BlockHeight)
+	return ResponsePack(Success, core.DefaultChain.BlockHeight)
 }
 
 func GetBestBlockHash(param Params) map[string]interface{} {
@@ -639,7 +639,7 @@ func GetBestBlockHash(param Params) map[string]interface{} {
 		return ResponsePack(InvalidParams, "height parameter should be a positive integer")
 	}
 
-	hash, err := chain.DefaultLedger.Store.GetBlockHash(height)
+	hash, err := core.DefaultChain.Store.GetBlockHash(height)
 	if err != nil {
 		return ResponsePack(InvalidParams, "")
 	}
@@ -647,7 +647,7 @@ func GetBestBlockHash(param Params) map[string]interface{} {
 }
 
 func GetBlockCount(param Params) map[string]interface{} {
-	return ResponsePack(Success, chain.DefaultLedger.Blockchain.BlockHeight+1)
+	return ResponsePack(Success, core.DefaultChain.BlockHeight+1)
 }
 
 func GetBlockHash(param Params) map[string]interface{} {
@@ -656,7 +656,7 @@ func GetBlockHash(param Params) map[string]interface{} {
 		return ResponsePack(InvalidParams, "height parameter should be a positive integer")
 	}
 
-	hash, err := chain.DefaultLedger.Store.GetBlockHash(height)
+	hash, err := core.DefaultChain.Store.GetBlockHash(height)
 	if err != nil {
 		return ResponsePack(InvalidParams, "")
 	}
@@ -687,12 +687,12 @@ func GetTransactionsByHeight(param Params) map[string]interface{} {
 		return ResponsePack(InvalidParams, "index parameter should be a positive integer")
 	}
 
-	hash, err := chain.DefaultLedger.Store.GetBlockHash(uint32(height))
+	hash, err := core.DefaultChain.Store.GetBlockHash(uint32(height))
 	if err != nil {
 		return ResponsePack(UnknownBlock, "")
 
 	}
-	block, err := chain.DefaultLedger.Store.GetBlock(hash)
+	block, err := core.DefaultChain.Store.GetBlock(hash)
 	if err != nil {
 		return ResponsePack(UnknownBlock, "")
 	}
@@ -705,7 +705,7 @@ func GetBlockByHeight(param Params) map[string]interface{} {
 		return ResponsePack(InvalidParams, "height parameter should be a positive integer")
 	}
 
-	hash, err := chain.DefaultLedger.Store.GetBlockHash(uint32(height))
+	hash, err := core.DefaultChain.Store.GetBlockHash(uint32(height))
 	if err != nil {
 		return ResponsePack(UnknownBlock, "")
 	}
@@ -730,7 +730,7 @@ func GetAssetByHash(param Params) map[string]interface{} {
 	if err != nil {
 		return ResponsePack(InvalidAsset, "")
 	}
-	asset, err := chain.DefaultLedger.Store.GetAsset(hash)
+	asset, err := core.DefaultChain.Store.GetAsset(hash)
 	if err != nil {
 		return ResponsePack(UnknownAsset, "")
 	}
@@ -752,7 +752,7 @@ func GetBalanceByAddr(param Params) map[string]interface{} {
 	if err != nil {
 		return ResponsePack(InvalidParams, "")
 	}
-	unspends, err := chain.DefaultLedger.Store.GetUnspentsFromProgramHash(*programHash)
+	unspends, err := core.DefaultChain.Store.GetUnspentsFromProgramHash(*programHash)
 	var balance Fixed64 = 0
 	for _, u := range unspends {
 		for _, v := range u {
@@ -786,7 +786,7 @@ func GetBalanceByAsset(param Params) map[string]interface{} {
 		return ResponsePack(InvalidParams, "")
 	}
 
-	unspents, err := chain.DefaultLedger.Store.GetUnspentsFromProgramHash(*programHash)
+	unspents, err := core.DefaultChain.Store.GetUnspentsFromProgramHash(*programHash)
 	var balance Fixed64 = 0
 	for k, u := range unspents {
 		for _, v := range u {
@@ -819,10 +819,10 @@ func GetUnspends(param Params) map[string]interface{} {
 		Utxo      []UTXOUnspentInfo
 	}
 	var results []Result
-	unspends, err := chain.DefaultLedger.Store.GetUnspentsFromProgramHash(*programHash)
+	unspends, err := core.DefaultChain.Store.GetUnspentsFromProgramHash(*programHash)
 
 	for k, u := range unspends {
-		asset, err := chain.DefaultLedger.Store.GetAsset(k)
+		asset, err := core.DefaultChain.Store.GetAsset(k)
 		if err != nil {
 			return ResponsePack(InternalError, "")
 		}
@@ -862,7 +862,7 @@ func GetUnspendOutput(param Params) map[string]interface{} {
 		Index uint32
 		Value string
 	}
-	infos, err := chain.DefaultLedger.Store.GetUnspentFromProgramHash(*programHash, assetHash)
+	infos, err := core.DefaultChain.Store.GetUnspentFromProgramHash(*programHash, assetHash)
 	if err != nil {
 		return ResponsePack(InvalidParams, "")
 
@@ -891,7 +891,7 @@ func GetTransactionByHash(param Params) map[string]interface{} {
 	if err != nil {
 		return ResponsePack(InvalidTransaction, "")
 	}
-	txn, height, err := chain.DefaultLedger.Store.GetTransaction(hash)
+	txn, height, err := core.DefaultChain.Store.GetTransaction(hash)
 	if err != nil {
 		return ResponsePack(UnknownTransaction, "")
 	}
@@ -900,11 +900,11 @@ func GetTransactionByHash(param Params) map[string]interface{} {
 		txn.Serialize(w)
 		return ResponsePack(Success, BytesToHexString(w.Bytes()))
 	}
-	bHash, err := chain.DefaultLedger.Store.GetBlockHash(height)
+	bHash, err := core.DefaultChain.Store.GetBlockHash(height)
 	if err != nil {
 		return ResponsePack(UnknownBlock, "")
 	}
-	header, err := chain.DefaultLedger.Store.GetHeader(bHash)
+	header, err := core.DefaultChain.Store.GetHeader(bHash)
 	if err != nil {
 		return ResponsePack(UnknownBlock, "")
 	}
@@ -939,7 +939,7 @@ func GetExistDepositTransactions(param Params) map[string]interface{} {
 		if err != nil {
 			return ResponsePack(InvalidParams, "")
 		}
-		inStore := chain.DefaultLedger.Store.IsMainchainTxHashDuplicate(*hash)
+		inStore := core.DefaultChain.Store.IsMainchainTxHashDuplicate(*hash)
 		inTxPool := NodeForServers.IsDuplicateMainchainTx(*hash)
 		if inTxPool || inStore {
 			resultTxHashes = append(resultTxHashes, txHash)
@@ -978,12 +978,12 @@ func GetDestroyedTransactionsByHeight(param Params) map[string]interface{} {
 		return ResponsePack(InvalidParams, "height parameter should be a positive integer")
 	}
 
-	hash, err := chain.DefaultLedger.Store.GetBlockHash(uint32(height))
+	hash, err := core.DefaultChain.Store.GetBlockHash(uint32(height))
 	if err != nil {
 		return ResponsePack(UnknownBlock, "")
 
 	}
-	block, err := chain.DefaultLedger.Store.GetBlock(hash)
+	block, err := core.DefaultChain.Store.GetBlock(hash)
 	if err != nil {
 		return ResponsePack(UnknownBlock, "")
 	}

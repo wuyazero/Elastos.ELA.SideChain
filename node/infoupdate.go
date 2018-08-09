@@ -3,7 +3,7 @@ package node
 import (
 	"time"
 
-	chain "github.com/elastos/Elastos.ELA.SideChain/blockchain"
+	"github.com/elastos/Elastos.ELA.SideChain/core"
 	"github.com/elastos/Elastos.ELA.SideChain/config"
 	"github.com/elastos/Elastos.ELA.SideChain/events"
 	"github.com/elastos/Elastos.ELA.SideChain/log"
@@ -74,9 +74,9 @@ func (node *node) hasSyncPeer() (bool, Noder) {
 func (node *node) SyncBlocks() {
 	needSync := node.needSync()
 	log.Info("needSync: ", needSync)
-	log.Trace("BlockHeight = ", chain.DefaultLedger.Blockchain.BlockHeight)
-	chain.DefaultLedger.Blockchain.DumpState()
-	bc := chain.DefaultLedger.Blockchain
+	log.Trace("BlockHeight = ", core.DefaultChain.BlockHeight)
+	core.DefaultChain.DumpState()
+	bc := core.DefaultChain
 	log.Info("[", len(bc.Index), len(bc.BlockCache), len(bc.Orphans), "]")
 	if needSync {
 		if LocalNode.IsSyncHeaders() {
@@ -87,8 +87,8 @@ func (node *node) SyncBlocks() {
 		if hasSyncPeer == false {
 			syncNode = node.GetBestHeightNoder()
 		}
-		hash := chain.DefaultLedger.Store.GetCurrentBlockHash()
-		locator := chain.DefaultLedger.Blockchain.BlockLocatorFromHash(&hash)
+		hash := core.DefaultChain.Store.GetCurrentBlockHash()
+		locator := core.DefaultChain.BlockLocatorFromHash(&hash)
 
 		SendGetBlocks(syncNode, locator, common.EmptyHash)
 		LocalNode.SetSyncHeaders(true)
@@ -130,7 +130,7 @@ func (node *node) Heartbeat() {
 		}
 
 		// send ping message to node
-		go node.Send(msg.NewPing(chain.DefaultLedger.Store.GetHeight()))
+		go node.Send(msg.NewPing(core.DefaultChain.Store.GetHeight()))
 	}
 QUIT:
 }

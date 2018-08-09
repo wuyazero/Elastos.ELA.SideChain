@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
-	chain "github.com/elastos/Elastos.ELA.SideChain/blockchain"
-	"github.com/elastos/Elastos.ELA.SideChain/bloom"
 	"github.com/elastos/Elastos.ELA.SideChain/core"
+	"github.com/elastos/Elastos.ELA.SideChain/bloom"
+	"github.com/elastos/Elastos.ELA.SideChain/core/types"
 	"github.com/elastos/Elastos.ELA.SideChain/errors"
 	"github.com/elastos/Elastos.ELA.SideChain/events"
 	"github.com/elastos/Elastos.ELA.SideChain/log"
@@ -69,9 +69,9 @@ func (h *MsgHandlerV1) OnMakeMessage(cmd string) (message p2p.Message, err error
 	case p2p.CmdGetData:
 		message = new(msg.GetData)
 	case p2p.CmdBlock:
-		message = msg.NewBlock(new(core.Block))
+		message = msg.NewBlock(new(types.Block))
 	case p2p.CmdTx:
-		message = msg.NewTx(new(core.Transaction))
+		message = msg.NewTx(new(types.Transaction))
 	case p2p.CmdNotFound:
 		message = new(msg.NotFound)
 	case p2p.CmdMemPool:
@@ -244,7 +244,7 @@ func (h *MsgHandlerV1) onFilterLoad(msg *msg.FilterLoad) error {
 
 func (h *MsgHandlerV1) onPing(ping *msg.Ping) error {
 	h.node.SetHeight(ping.Nonce)
-	h.node.Send(msg.NewPong(chain.DefaultLedger.Blockchain.BestChain.Height))
+	h.node.Send(msg.NewPong(core.DefaultChain.BestChain.Height))
 	return nil
 }
 
@@ -258,7 +258,7 @@ func (h *MsgHandlerV1) onGetBlocks(req *msg.GetBlocks) error {
 	LocalNode.AcqSyncHdrReqSem()
 	defer LocalNode.RelSyncHdrReqSem()
 
-	start := chain.DefaultLedger.Blockchain.LatestLocatorHash(req.Locator)
+	start := core.DefaultChain.LatestLocatorHash(req.Locator)
 	hashes, err := GetBlockHashes(*start, req.HashStop, p2p.MaxBlocksPerMsg)
 	if err != nil {
 		return err
@@ -303,8 +303,8 @@ func (h *MsgHandlerV1) onInventory(inv *msg.Inventory) error {
 		hash := iv.Hash
 		switch iv.Type {
 		case msg.InvTypeBlock:
-			haveInv := chain.DefaultLedger.BlockInLedger(hash) ||
-				chain.DefaultLedger.Blockchain.IsKnownOrphan(&hash) || LocalNode.IsRequestedBlock(hash)
+			haveInv := core.DefaultChain.BlockInLedger(hash) ||
+				core.DefaultChain.IsKnownOrphan(&hash) || LocalNode.IsRequestedBlock(hash)
 
 			// Block need to be request
 			if !haveInv {
@@ -314,9 +314,9 @@ func (h *MsgHandlerV1) onInventory(inv *msg.Inventory) error {
 			}
 
 			// Request fork chain
-			if chain.DefaultLedger.Blockchain.IsKnownOrphan(&hash) {
-				orphanRoot := chain.DefaultLedger.Blockchain.GetOrphanRoot(&hash)
-				locator, err := chain.DefaultLedger.Blockchain.LatestBlockLocator()
+			if core.DefaultChain.IsKnownOrphan(&hash) {
+				orphanRoot := core.DefaultChain.GetOrphanRoot(&hash)
+				locator, err := core.DefaultChain.LatestBlockLocator()
 				if err != nil {
 					log.Errorf(" Failed to get block locator for the latest block: %v", err)
 					continue
@@ -327,7 +327,7 @@ func (h *MsgHandlerV1) onInventory(inv *msg.Inventory) error {
 
 			// Request next hashes
 			if i == lastBlock {
-				locator := chain.DefaultLedger.Blockchain.BlockLocatorFromHash(&hash)
+				locator := core.DefaultChain.BlockLocatorFromHash(&hash)
 				SendGetBlocks(node, locator, common.EmptyHash)
 			}
 		case msg.InvTypeTx:
@@ -352,7 +352,7 @@ func (h *MsgHandlerV1) onGetData(getData *msg.GetData) error {
 	for _, iv := range getData.InvList {
 		switch iv.Type {
 		case msg.InvTypeBlock:
-			block, err := chain.DefaultLedger.Store.GetBlock(iv.Hash)
+			block, err := core.DefaultChain.Store.GetBlock(iv.Hash)
 			if err != nil {
 				log.Debug("Can't get block from hash: ", iv.Hash, " ,send not found message")
 				notFound.AddInvVect(iv)
@@ -363,7 +363,7 @@ func (h *MsgHandlerV1) onGetData(getData *msg.GetData) error {
 			node.Send(msg.NewBlock(block))
 
 			if h.continueHash != nil && h.continueHash.IsEqual(iv.Hash) {
-				best := chain.DefaultLedger.Blockchain.BestChain
+				best := core.DefaultChain.BestChain
 				inv := msg.NewInventory()
 				inv.AddInvVect(msg.NewInvVect(msg.InvTypeBlock, best.Hash))
 				node.Send(inv)
@@ -384,7 +384,7 @@ func (h *MsgHandlerV1) onGetData(getData *msg.GetData) error {
 				return nil
 			}
 
-			block, err := chain.DefaultLedger.Store.GetBlock(iv.Hash)
+			block, err := core.DefaultChain.Store.GetBlock(iv.Hash)
 			if err != nil {
 				log.Debug("Can't get block from hash: ", iv.Hash, " ,send not found message")
 				notFound.AddInvVect(iv)
@@ -412,24 +412,24 @@ func (h *MsgHandlerV1) onGetData(getData *msg.GetData) error {
 
 func (h *MsgHandlerV1) onBlock(msgBlock *msg.Block) error {
 	node := h.node
-	block := msgBlock.Block.(*core.Block)
+	block := msgBlock.Block.(*types.Block)
 
 	hash := block.Hash()
 	if !LocalNode.IsNeighborNoder(node) {
 		return fmt.Errorf("received block message from unknown peer")
 	}
 
-	if chain.DefaultLedger.BlockInLedger(hash) {
+	if core.DefaultChain.BlockInLedger(hash) {
 		log.Trace("Receive duplicated block, ", hash.String())
 		return nil
 	}
 
 	// Update sync timer
 	LocalNode.syncTimer.update()
-	chain.DefaultLedger.Store.RemoveHeaderListElement(hash)
+	core.DefaultChain.Store.RemoveHeaderListElement(hash)
 	LocalNode.DeleteRequestedBlock(hash)
 
-	_, isOrphan, err := chain.DefaultLedger.Blockchain.AddBlock(block)
+	_, isOrphan, err := core.DefaultChain.AddBlock(block)
 	if err != nil {
 		reject := msg.NewReject(msgBlock.CMD(), msg.RejectInvalid, err.Error())
 		reject.Hash = block.Hash()
@@ -439,8 +439,8 @@ func (h *MsgHandlerV1) onBlock(msgBlock *msg.Block) error {
 	}
 
 	if isOrphan {
-		orphanRoot := chain.DefaultLedger.Blockchain.GetOrphanRoot(&hash)
-		locator, _ := chain.DefaultLedger.Blockchain.LatestBlockLocator()
+		orphanRoot := core.DefaultChain.GetOrphanRoot(&hash)
+		locator, _ := core.DefaultChain.LatestBlockLocator()
 		SendGetBlocks(node, locator, *orphanRoot)
 	}
 
@@ -454,7 +454,7 @@ func (h *MsgHandlerV1) onBlock(msgBlock *msg.Block) error {
 
 func (h *MsgHandlerV1) onTx(msgTx *msg.Tx) error {
 	node := h.node
-	tx := msgTx.Transaction.(*core.Transaction)
+	tx := msgTx.Transaction.(*types.Transaction)
 
 	if !LocalNode.IsNeighborNoder(node) {
 		return fmt.Errorf("received transaction message from unknown peer")
@@ -529,7 +529,7 @@ func NewVersion(node protocol.Noder) *msg.Version {
 	msg.TimeStamp = uint32(time.Now().UTC().UnixNano())
 	msg.Port = node.Port()
 	msg.Nonce = node.ID()
-	msg.Height = uint64(chain.DefaultLedger.GetLocalBlockChainHeight())
+	msg.Height = uint64(core.DefaultChain.GetBestHeight())
 	if node.IsRelay() {
 		msg.Relay = 1
 	} else {
@@ -553,7 +553,7 @@ func GetBlockHashes(startHash common.Uint256, stopHash common.Uint256, maxBlockH
 	var count = uint32(0)
 	var startHeight uint32
 	var stopHeight uint32
-	curHeight := chain.DefaultLedger.Store.GetHeight()
+	curHeight := core.DefaultChain.Store.GetHeight()
 	if stopHash == common.EmptyHash {
 		if startHash == common.EmptyHash {
 			if curHeight > maxBlockHashes {
@@ -562,7 +562,7 @@ func GetBlockHashes(startHash common.Uint256, stopHash common.Uint256, maxBlockH
 				count = curHeight
 			}
 		} else {
-			startHeader, err := chain.DefaultLedger.Store.GetHeader(startHash)
+			startHeader, err := core.DefaultChain.Store.GetHeader(startHash)
 			if err != nil {
 				return nil, err
 			}
@@ -573,13 +573,13 @@ func GetBlockHashes(startHash common.Uint256, stopHash common.Uint256, maxBlockH
 			}
 		}
 	} else {
-		stopHeader, err := chain.DefaultLedger.Store.GetHeader(stopHash)
+		stopHeader, err := core.DefaultChain.Store.GetHeader(stopHash)
 		if err != nil {
 			return nil, err
 		}
 		stopHeight = stopHeader.Height
 		if startHash != common.EmptyHash {
-			startHeader, err := chain.DefaultLedger.Store.GetHeader(startHash)
+			startHeader, err := core.DefaultChain.Store.GetHeader(startHash)
 			if err != nil {
 				return nil, err
 			}
@@ -605,7 +605,7 @@ func GetBlockHashes(startHash common.Uint256, stopHash common.Uint256, maxBlockH
 
 	hashes := make([]*common.Uint256, 0)
 	for i := uint32(1); i <= count; i++ {
-		hash, err := chain.DefaultLedger.Store.GetBlockHash(startHeight + i)
+		hash, err := core.DefaultChain.Store.GetBlockHash(startHeight + i)
 		if err != nil {
 			return nil, err
 		}

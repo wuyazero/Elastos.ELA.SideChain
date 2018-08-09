@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/elastos/Elastos.ELA.SideChain/bloom"
-	"github.com/elastos/Elastos.ELA.SideChain/core"
+	"github.com/elastos/Elastos.ELA.SideChain/core/types"
 	"github.com/elastos/Elastos.ELA.SideChain/errors"
 	"github.com/elastos/Elastos.ELA.SideChain/events"
 
@@ -51,8 +51,8 @@ type Noder interface {
 	GetConn() net.Conn
 	CloseConn()
 	GetConnectionCnt() uint
-	GetTxsInPool() map[common.Uint256]*core.Transaction
-	AppendToTxnPool(*core.Transaction) errors.ErrCode
+	GetTxsInPool() map[common.Uint256]*types.Transaction
+	AppendToTxnPool(*types.Transaction) errors.ErrCode
 	IsDuplicateMainchainTx(mainchainTxHash common.Uint256) bool
 	ExistedID(id common.Uint256) bool
 	DumpInfo()
@@ -67,16 +67,16 @@ type Noder interface {
 	NodeEstablished(uid uint64) bool
 	GetEvent(eventName string) *events.Event
 	GetNeighborAddrs() []p2p.NetAddress
-	GetTransaction(hash common.Uint256) *core.Transaction
+	GetTransaction(hash common.Uint256) *types.Transaction
 	IncRxTxnCnt()
 	GetTxnCnt() uint64
 	GetRxTxnCnt() uint64
 
 	GetNeighborHeights() []uint64
 	WaitForSyncFinish()
-	CleanSubmittedTransactions(block *core.Block) error
-	MaybeAcceptTransaction(txn *core.Transaction) error
-	RemoveTransaction(txn *core.Transaction)
+	CleanSubmittedTransactions(block *types.Block) error
+	MaybeAcceptTransaction(txn *types.Transaction) error
+	RemoveTransaction(txn *types.Transaction)
 
 	GetNeighborNoder() []Noder
 	GetNbrNodeCnt() uint32

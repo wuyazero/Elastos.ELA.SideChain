@@ -13,10 +13,10 @@ import (
 	"sync"
 	"time"
 
-	chain "github.com/elastos/Elastos.ELA.SideChain/blockchain"
+	"github.com/elastos/Elastos.ELA.SideChain/core"
 	"github.com/elastos/Elastos.ELA.SideChain/bloom"
 	. "github.com/elastos/Elastos.ELA.SideChain/config"
-	. "github.com/elastos/Elastos.ELA.SideChain/core"
+	. "github.com/elastos/Elastos.ELA.SideChain/core/types"
 	"github.com/elastos/Elastos.ELA.SideChain/events"
 	"github.com/elastos/Elastos.ELA.SideChain/log"
 	. "github.com/elastos/Elastos.ELA.SideChain/protocol"
@@ -40,20 +40,20 @@ func (s Semaphore) release() { <-s }
 
 type node struct {
 	//sync.RWMutex	//The Lock not be used as expected to use function channel instead of lock
-	p2p.PeerState               // node state
-	id            uint64        // The nodes's id
-	version       uint32        // The network protocol the node used
-	services      uint64        // The services the node supplied
-	relay         bool          // The relay capability of the node (merge into capbility flag)
-	height        uint64        // The node latest block height
-	txnCnt        uint64        // The transactions be transmit by this node
-	rxTxnCnt      uint64        // The transaction received by this node
-	link                        // The link status and infomation
-	nbrNodes                    // The neighbor node connect with currently node except itself
-	eventQueue                  // The event queue to notice notice other modules
-	chain.TxPool                // Unconfirmed transaction pool
-	idCache                     // The buffer to store the id of the items which already be processed
-	filter        *bloom.Filter // The bloom filter of a spv node
+	p2p.PeerState          // node state
+	id       uint64        // The nodes's id
+	version  uint32        // The network protocol the node used
+	services uint64        // The services the node supplied
+	relay    bool          // The relay capability of the node (merge into capbility flag)
+	height   uint64        // The node latest block height
+	txnCnt   uint64        // The transactions be transmit by this node
+	rxTxnCnt uint64        // The transaction received by this node
+	link                   // The link status and infomation
+	nbrNodes               // The neighbor node connect with currently node except itself
+	eventQueue             // The event queue to notice notice other modules
+	core.TxPool            // Unconfirmed transaction pool
+	idCache                // The buffer to store the id of the items which already be processed
+	filter   *bloom.Filter // The bloom filter of a spv node
 	/*
 	 * |--|--|--|--|--|--|isSyncFailed|isSyncHeaders|
 	 */
@@ -279,14 +279,14 @@ func (node *node) GetTime() int64 {
 
 func (node *node) WaitForSyncFinish() {
 	for {
-		log.Trace("BlockHeight is ", chain.DefaultLedger.Blockchain.BlockHeight)
-		bc := chain.DefaultLedger.Blockchain
+		log.Trace("BlockHeight is ", core.DefaultChain.BlockHeight)
+		bc := core.DefaultChain
 		log.Info("[", len(bc.Index), len(bc.BlockCache), len(bc.Orphans), "]")
 
 		heights := node.GetNeighborHeights()
 		log.Trace("others height is ", heights)
 
-		if CompareHeight(uint64(chain.DefaultLedger.Blockchain.BlockHeight), heights) {
+		if CompareHeight(uint64(core.DefaultChain.BlockHeight), heights) {
 			LocalNode.SetSyncHeaders(false)
 			break
 		}
@@ -403,8 +403,8 @@ func (node node) IsSyncFailed() bool {
 
 func (node *node) needSync() bool {
 	heights := node.GetNeighborHeights()
-	log.Info("nbr heigh-->", heights, chain.DefaultLedger.Blockchain.BlockHeight)
-	if CompareHeight(uint64(chain.DefaultLedger.Blockchain.BlockHeight), heights) {
+	log.Info("nbr heigh-->", heights, core.DefaultChain.BlockHeight)
+	if CompareHeight(uint64(core.DefaultChain.BlockHeight), heights) {
 		return false
 	}
 	return true

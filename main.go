@@ -4,7 +4,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/elastos/Elastos.ELA.SideChain/blockchain"
+	"github.com/elastos/Elastos.ELA.SideChain/core"
 	"github.com/elastos/Elastos.ELA.SideChain/config"
 	"github.com/elastos/Elastos.ELA.SideChain/log"
 	"github.com/elastos/Elastos.ELA.SideChain/node"
@@ -16,8 +16,10 @@ import (
 	"github.com/elastos/Elastos.ELA.SideChain/servers/httprestful"
 	"github.com/elastos/Elastos.ELA.SideChain/servers/httpwebsocket"
 	"github.com/elastos/Elastos.ELA.SideChain/spv"
+	"github.com/elastos/Elastos.ELA.SideChain/store"
 
 	"github.com/elastos/Elastos.ELA.Utility/common"
+	"github.com/elastos/Elastos.ELA.SideChain/store/leveldb"
 )
 
 const (
@@ -42,7 +44,7 @@ func init() {
 		log.Info("Please set correct foundation address in config file")
 		os.Exit(-1)
 	}
-	blockchain.FoundationAddress = *address
+	core.FoundationAddress = *address
 
 	log.Debug("The Core number is ", coreNum)
 	runtime.GOMAXPROCS(coreNum)
@@ -60,16 +62,19 @@ func main() {
 	//var blockChain *ledger.Blockchain
 	var err error
 	var noder protocol.Noder
+	var chainStore core.IChainStore
 	log.Info("Node version: ", config.Version)
 	log.Info("1. BlockChain init")
-	chainStore, err := blockchain.NewChainStore()
+	// TODO: read config file decide which db to use.
+	db, err := leveldb.NewLevelDB("Chain")
 	if err != nil {
-		log.Fatal("open LedgerStore err:", err)
+		log.Fatal("Open chain store err:", err)
 		goto ERROR
 	}
-	defer chainStore.Close()
 
-	err = blockchain.Init(chainStore)
+	chainStore = store.NewChainStore(db)
+	defer chainStore.Close()
+	err = core.Init(chainStore)
 	if err != nil {
 		log.Fatal(err, "BlockChain initialize failed")
 		goto ERROR

@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/elastos/Elastos.ELA.SideChain/config"
-	"github.com/elastos/Elastos.ELA.SideChain/core"
+	"github.com/elastos/Elastos.ELA.SideChain/core/types"
 	"github.com/elastos/Elastos.ELA.SideChain/log"
 
 	spv "github.com/elastos/Elastos.ELA.SPV/interface"
@@ -52,11 +52,11 @@ func SpvInit() error {
 	return nil
 }
 
-func VerifyTransaction(tx *core.Transaction) error {
+func VerifyTransaction(tx *types.Transaction) error {
 	proof := new(MerkleProof)
 	mainChainTransaction := new(ela.Transaction)
 
-	payloadObj, ok := tx.Payload.(*core.PayloadRechargeToSideChain)
+	payloadObj, ok := tx.Payload.(*types.PayloadRechargeToSideChain)
 	if !ok {
 		return errors.New("Invalid payload core.PayloadRechargeToSideChain")
 	}

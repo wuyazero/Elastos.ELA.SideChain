@@ -1,7 +1,7 @@
 package servers
 
 import (
-	. "github.com/elastos/Elastos.ELA.SideChain/core"
+	. "github.com/elastos/Elastos.ELA.SideChain/core/types"
 
 	"github.com/elastos/Elastos.ELA.Utility/common"
 )
