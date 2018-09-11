@@ -4,7 +4,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/elastos/Elastos.ELA.SideChain/vm/errors"
+	"github.com/wuyazero/Elastos.ELA.SideChain/vm/errors"
 )
 
 func opNop(e *ExecutionEngine) (VMState, error) {

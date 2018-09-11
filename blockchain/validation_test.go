@@ -8,10 +8,10 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/elastos/Elastos.ELA.SideChain/core"
+	"github.com/wuyazero/Elastos.ELA.SideChain/core"
 
-	"github.com/elastos/Elastos.ELA.Utility/common"
-	"github.com/elastos/Elastos.ELA.Utility/crypto"
+	"github.com/wuyazero/Elastos.ELA.Utility/common"
+	"github.com/wuyazero/Elastos.ELA.Utility/crypto"
 	"github.com/stretchr/testify/assert"
 )
 

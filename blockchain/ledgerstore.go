@@ -1,9 +1,9 @@
 package blockchain
 
 import (
-	"github.com/elastos/Elastos.ELA.SideChain/core"
+	"github.com/wuyazero/Elastos.ELA.SideChain/core"
 
-	. "github.com/elastos/Elastos.ELA.Utility/common"
+	. "github.com/wuyazero/Elastos.ELA.Utility/common"
 )
 
 // IChainStore provides func with store package.

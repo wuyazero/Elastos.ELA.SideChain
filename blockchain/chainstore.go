@@ -7,11 +7,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastos/Elastos.ELA.SideChain/core"
-	"github.com/elastos/Elastos.ELA.SideChain/events"
-	"github.com/elastos/Elastos.ELA.SideChain/log"
+	"github.com/wuyazero/Elastos.ELA.SideChain/core"
+	"github.com/wuyazero/Elastos.ELA.SideChain/events"
+	"github.com/wuyazero/Elastos.ELA.SideChain/log"
 
-	. "github.com/elastos/Elastos.ELA.Utility/common"
+	. "github.com/wuyazero/Elastos.ELA.Utility/common"
 )
 
 const ValueNone = 0

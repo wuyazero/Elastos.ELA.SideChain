@@ -2,8 +2,8 @@ package vm
 
 import (
 	"encoding/binary"
-	"github.com/elastos/Elastos.ELA.SideChain/vm/errors"
-	"github.com/elastos/Elastos.ELA.SideChain/vm/types"
+	"github.com/wuyazero/Elastos.ELA.SideChain/vm/errors"
+	"github.com/wuyazero/Elastos.ELA.SideChain/vm/types"
 	"math/big"
 	"reflect"
 )

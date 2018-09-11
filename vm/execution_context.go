@@ -1,6 +1,6 @@
 package vm
 
-import "github.com/elastos/Elastos.ELA.SideChain/vm/utils"
+import "github.com/wuyazero/Elastos.ELA.SideChain/vm/utils"
 
 type ExecutionContext struct {
 	Script             []byte

@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/elastos/Elastos.ELA.SideChain/common"
-	"github.com/elastos/Elastos.ELA.SideChain/config"
-	"github.com/elastos/Elastos.ELA.SideChain/core"
-	. "github.com/elastos/Elastos.ELA.SideChain/errors"
-	"github.com/elastos/Elastos.ELA.SideChain/log"
+	"github.com/wuyazero/Elastos.ELA.SideChain/common"
+	"github.com/wuyazero/Elastos.ELA.SideChain/config"
+	"github.com/wuyazero/Elastos.ELA.SideChain/core"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/errors"
+	"github.com/wuyazero/Elastos.ELA.SideChain/log"
 
-	. "github.com/elastos/Elastos.ELA.Utility/common"
-	"github.com/elastos/Elastos.ELA.Utility/crypto"
-	. "github.com/elastos/Elastos.ELA/bloom"
-	ela "github.com/elastos/Elastos.ELA/core"
+	. "github.com/wuyazero/Elastos.ELA.Utility/common"
+	"github.com/wuyazero/Elastos.ELA.Utility/crypto"
+	. "github.com/wuyazero/Elastos.ELA/bloom"
+	ela "github.com/wuyazero/Elastos.ELA/core"
 )
 
 // CheckTransactionSanity verifys received single transaction

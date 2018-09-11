@@ -9,16 +9,16 @@ import (
 	"sync"
 	"time"
 
-	aux "github.com/elastos/Elastos.ELA.SideChain/auxpow"
-	. "github.com/elastos/Elastos.ELA.SideChain/blockchain"
-	"github.com/elastos/Elastos.ELA.SideChain/config"
-	"github.com/elastos/Elastos.ELA.SideChain/core"
-	"github.com/elastos/Elastos.ELA.SideChain/events"
-	"github.com/elastos/Elastos.ELA.SideChain/log"
-	"github.com/elastos/Elastos.ELA.SideChain/protocol"
+	aux "github.com/wuyazero/Elastos.ELA.SideChain/auxpow"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/blockchain"
+	"github.com/wuyazero/Elastos.ELA.SideChain/config"
+	"github.com/wuyazero/Elastos.ELA.SideChain/core"
+	"github.com/wuyazero/Elastos.ELA.SideChain/events"
+	"github.com/wuyazero/Elastos.ELA.SideChain/log"
+	"github.com/wuyazero/Elastos.ELA.SideChain/protocol"
 
-	"github.com/elastos/Elastos.ELA.Utility/common"
-	"github.com/elastos/Elastos.ELA.Utility/crypto"
+	"github.com/wuyazero/Elastos.ELA.Utility/common"
+	"github.com/wuyazero/Elastos.ELA.Utility/crypto"
 )
 
 var TaskCh chan bool

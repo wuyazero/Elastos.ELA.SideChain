@@ -6,12 +6,12 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/elastos/Elastos.ELA.SideChain/config"
-	. "github.com/elastos/Elastos.ELA.SideChain/core"
-	. "github.com/elastos/Elastos.ELA.SideChain/errors"
+	"github.com/wuyazero/Elastos.ELA.SideChain/config"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/core"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/errors"
 
-	. "github.com/elastos/Elastos.ELA.Utility/common"
-	"github.com/elastos/Elastos.ELA.Utility/crypto"
+	. "github.com/wuyazero/Elastos.ELA.Utility/common"
+	"github.com/wuyazero/Elastos.ELA.Utility/crypto"
 )
 
 const (

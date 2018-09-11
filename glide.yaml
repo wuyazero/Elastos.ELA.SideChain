@@ -1,13 +1,13 @@
-package: github.com/elastos/Elastos.ELA.SideChain
+package: github.com/wuyazero/Elastos.ELA.SideChain
 import:
 - package: github.com/golang/crypto
 - package: github.com/golang/sys
 - package: github.com/AlexpanXX/fsnotify
-- package: github.com/elastos/Elastos.ELA.SPV
+- package: github.com/wuyazero/Elastos.ELA.SPV
   version: dev
-- package: github.com/elastos/Elastos.ELA.Utility
+- package: github.com/wuyazero/Elastos.ELA.Utility
   version: dev
-- package: github.com/elastos/Elastos.ELA
+- package: github.com/wuyazero/Elastos.ELA
   version: release_v0.2.0
 - package: github.com/gorilla/websocket
 - package: github.com/mattn/go-sqlite3

@@ -4,10 +4,10 @@ import (
 	"container/list"
 	"testing"
 
-	"github.com/elastos/Elastos.ELA.SideChain/core"
+	"github.com/wuyazero/Elastos.ELA.SideChain/core"
 
 	"bytes"
-	"github.com/elastos/Elastos.ELA.Utility/common"
+	"github.com/wuyazero/Elastos.ELA.Utility/common"
 )
 
 var testChainStore *ChainStore

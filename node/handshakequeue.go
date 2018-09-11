@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastos/Elastos.ELA.SideChain/protocol"
+	"github.com/wuyazero/Elastos.ELA.SideChain/protocol"
 )
 
 /*

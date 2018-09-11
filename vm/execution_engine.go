@@ -5,8 +5,8 @@ import (
 	_ "math/big"
 	_ "sort"
 
-	"github.com/elastos/Elastos.ELA.SideChain/vm/interfaces"
-	"github.com/elastos/Elastos.ELA.SideChain/vm/utils"
+	"github.com/wuyazero/Elastos.ELA.SideChain/vm/interfaces"
+	"github.com/wuyazero/Elastos.ELA.SideChain/vm/utils"
 )
 
 const MAXSTEPS int = 1200

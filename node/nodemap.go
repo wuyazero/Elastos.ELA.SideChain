@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"sync"
 
-	. "github.com/elastos/Elastos.ELA.SideChain/protocol"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/protocol"
 
-	"github.com/elastos/Elastos.ELA.Utility/p2p"
+	"github.com/wuyazero/Elastos.ELA.Utility/p2p"
 )
 
 // The neigbor node list

@@ -3,9 +3,9 @@ package auxpow
 import (
 	"io"
 
-	. "github.com/elastos/Elastos.ELA.Utility/common"
-	"github.com/elastos/Elastos.ELA/auxpow"
-	ela "github.com/elastos/Elastos.ELA/core"
+	. "github.com/wuyazero/Elastos.ELA.Utility/common"
+	"github.com/wuyazero/Elastos.ELA/auxpow"
+	ela "github.com/wuyazero/Elastos.ELA/core"
 )
 
 type SideAuxPow struct {

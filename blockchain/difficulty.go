@@ -5,10 +5,10 @@ import (
 	"math/big"
 	"time"
 
-	"github.com/elastos/Elastos.ELA.SideChain/config"
-	"github.com/elastos/Elastos.ELA.SideChain/log"
+	"github.com/wuyazero/Elastos.ELA.SideChain/config"
+	"github.com/wuyazero/Elastos.ELA.SideChain/log"
 
-	. "github.com/elastos/Elastos.ELA.Utility/common"
+	. "github.com/wuyazero/Elastos.ELA.Utility/common"
 )
 
 var (

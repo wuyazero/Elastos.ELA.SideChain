@@ -3,8 +3,8 @@ package common
 import (
 	"bytes"
 
-	"github.com/elastos/Elastos.ELA.Utility/common"
-	"github.com/elastos/Elastos.ELA.Utility/crypto"
+	"github.com/wuyazero/Elastos.ELA.Utility/common"
+	"github.com/wuyazero/Elastos.ELA.Utility/crypto"
 )
 
 func GetGenesisAddress(genesisHash common.Uint256) (string, error) {

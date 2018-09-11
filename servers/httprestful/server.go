@@ -11,10 +11,10 @@ import (
 	"strings"
 	"sync"
 
-	. "github.com/elastos/Elastos.ELA.SideChain/config"
-	. "github.com/elastos/Elastos.ELA.SideChain/errors"
-	"github.com/elastos/Elastos.ELA.SideChain/log"
-	"github.com/elastos/Elastos.ELA.SideChain/servers"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/config"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/errors"
+	"github.com/wuyazero/Elastos.ELA.SideChain/log"
+	"github.com/wuyazero/Elastos.ELA.SideChain/servers"
 )
 
 const (

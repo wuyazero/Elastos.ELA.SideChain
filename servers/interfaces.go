@@ -8,15 +8,15 @@ import (
 	"fmt"
 	"time"
 
-	chain "github.com/elastos/Elastos.ELA.SideChain/blockchain"
-	"github.com/elastos/Elastos.ELA.SideChain/config"
-	. "github.com/elastos/Elastos.ELA.SideChain/core"
-	. "github.com/elastos/Elastos.ELA.SideChain/errors"
-	"github.com/elastos/Elastos.ELA.SideChain/log"
-	"github.com/elastos/Elastos.ELA.SideChain/pow"
-	. "github.com/elastos/Elastos.ELA.SideChain/protocol"
+	chain "github.com/wuyazero/Elastos.ELA.SideChain/blockchain"
+	"github.com/wuyazero/Elastos.ELA.SideChain/config"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/core"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/errors"
+	"github.com/wuyazero/Elastos.ELA.SideChain/log"
+	"github.com/wuyazero/Elastos.ELA.SideChain/pow"
+	. "github.com/wuyazero/Elastos.ELA.SideChain/protocol"
 
-	. "github.com/elastos/Elastos.ELA.Utility/common"
+	. "github.com/wuyazero/Elastos.ELA.Utility/common"
 )
 
 const (

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/elastos/Elastos.ELA.SideChain/core"
-	"github.com/elastos/Elastos.ELA.SideChain/spv"
-	"github.com/elastos/Elastos.ELA.SideChain/vm"
+	"github.com/wuyazero/Elastos.ELA.SideChain/core"
+	"github.com/wuyazero/Elastos.ELA.SideChain/spv"
+	"github.com/wuyazero/Elastos.ELA.SideChain/vm"
 
-	. "github.com/elastos/Elastos.ELA.Utility/common"
-	"github.com/elastos/Elastos.ELA.Utility/crypto"
+	. "github.com/wuyazero/Elastos.ELA.Utility/common"
+	"github.com/wuyazero/Elastos.ELA.Utility/crypto"
 )
 
 func VerifySignature(tx *core.Transaction) error {

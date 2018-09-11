@@ -7,16 +7,16 @@ import (
 	"errors"
 	"os"
 
-	"github.com/elastos/Elastos.ELA.SideChain/config"
-	"github.com/elastos/Elastos.ELA.SideChain/core"
-	"github.com/elastos/Elastos.ELA.SideChain/log"
+	"github.com/wuyazero/Elastos.ELA.SideChain/config"
+	"github.com/wuyazero/Elastos.ELA.SideChain/core"
+	"github.com/wuyazero/Elastos.ELA.SideChain/log"
 
-	spv "github.com/elastos/Elastos.ELA.SPV/interface"
-	spvlog "github.com/elastos/Elastos.ELA.SPV/log"
-	"github.com/elastos/Elastos.ELA.Utility/common"
-	"github.com/elastos/Elastos.ELA/bloom"
-	. "github.com/elastos/Elastos.ELA/bloom"
-	ela "github.com/elastos/Elastos.ELA/core"
+	spv "github.com/wuyazero/Elastos.ELA.SPV/interface"
+	spvlog "github.com/wuyazero/Elastos.ELA.SPV/log"
+	"github.com/wuyazero/Elastos.ELA.Utility/common"
+	"github.com/wuyazero/Elastos.ELA/bloom"
+	. "github.com/wuyazero/Elastos.ELA/bloom"
+	ela "github.com/wuyazero/Elastos.ELA/core"
 )
 
 var spvService spv.SPVService

@@ -3,7 +3,7 @@ package core
 import (
 	"io"
 
-	. "github.com/elastos/Elastos.ELA.Utility/common"
+	. "github.com/wuyazero/Elastos.ELA.Utility/common"
 )
 
 const PayloadCoinBaseVersion byte = 0x04
